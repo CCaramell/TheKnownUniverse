@@ -70,6 +70,12 @@ description='''Explore the world of The Known Universe. The darkness and light b
     ordering="NONE"
     side="BOTH"
 
+[[dependencies.${mod_id}]]
+    modId="geckolib" #mandatory
+    mandatory=true #mandatory
+    versionRange="[${geckolib_version},)" #mandatory
+    ordering="NONE"
+    side="BOTH"
 
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't

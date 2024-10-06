@@ -12,9 +12,15 @@ import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.entity.spells.void_tentacle.VoidTentacle;
+import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import io.redspace.ironsspellbooks.registries.SoundRegistry;
+import io.redspace.ironsspellbooks.spells.eldritch.AbstractEldritchSpell;
+import io.redspace.ironsspellbooks.util.ModTags;
+import net.minecraft.network.chat.Component;
+import io.redspace.ironsspellbooks.util.Log;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -25,12 +31,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
 
 import java.util.List;
 import java.util.Optional;
 
 @AutoSpellConfig
-public class ObscuraEntangle extends AbstractSpell{
+public class ObscuraEntangle extends AbstractSpell {
     private final ResourceLocation spellId = new ResourceLocation(TheKnownUniverse.MOD_ID, "obscura_entangle");
 
     @Override
@@ -94,8 +102,24 @@ public class ObscuraEntangle extends AbstractSpell{
         Vec3 center = null;
         if (playerMagicData.getAdditionalCastData() instanceof TargetEntityCastData castTargetingData) {
             var target = castTargetingData.getTarget((ServerLevel) level);
-            if (target != null)
+
+            if (Log.SPELL_DEBUG) {
+                TheKnownUniverse.LOGGER.debug("RootSpell.onCast.1 targetEntity:{}", target);
+            }
+            if (target != null && !target.getType().is(ModTags.CANT_ROOT)) {
                 center = target.position();
+                if (Log.SPELL_DEBUG) {
+                    TheKnownUniverse.LOGGER.debug("RootSpell.onCast.2 targetEntity:{}", target);
+                }
+                Vec3 spawn = target.position();
+                RootEntity rootEntity = new RootEntity(level, entity);
+                rootEntity.setDuration(getDuration(spellLevel, entity));
+                rootEntity.setTarget(target);
+                rootEntity.moveTo(spawn);
+                level.addFreshEntity(rootEntity);
+                target.stopRiding();
+                target.startRiding(rootEntity, true);
+            }
         }
         if (center == null) {
             center = Utils.raycastForEntity(level, entity, 48, true, .15f).getLocation();
@@ -121,6 +145,20 @@ public class ObscuraEntangle extends AbstractSpell{
         //In order to trigger sculk sensors
         level.gameEvent(null, GameEvent.ENTITY_ROAR, center);
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
+    }
+
+    @Nullable
+    private LivingEntity findTarget(LivingEntity caster) {
+        var target = Utils.raycastForEntity(caster.level(), caster, 32, true, 0.35f);
+        if (target instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof LivingEntity livingTarget) {
+            return livingTarget;
+        } else {
+            return null;
+        }
+    }
+
+    public int getDuration(int spellLevel, LivingEntity caster) {
+        return (int) (getSpellPower(spellLevel, caster) * 20);
     }
 
     private float getDamage(int spellLevel, LivingEntity entity) {
