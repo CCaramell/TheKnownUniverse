@@ -1,0 +1,16 @@
+{
+  "spell.theknownuniverse.obscura_entangle": "Obscura Entangle",
+  "spell.theknownuniverse.obscura_entangle.guide": "Cast darkness to trap enemies and do massive damage to them",
+  "ui.theknownuniverse.damage": "%d Damage",
+  "ui.theknownuniverse.radius": "%d Block Radius",
+  "item.theknownuniverse.nahils_blade": "Nahil's Blade",
+  "tooltip.theknownuniverse.tooltip": "%s",
+  "school.theknownuniverse.darkness":"Darkness",
+  "ui.theknownuniverse.aoe_damage":"%d AOE Damage" ,
+  "ui.theknownuniverse.aoe_radius": "%d AOE Block Radius",
+  "ui.theknownuniverse.slowed": "%d%% Slowed",
+  "ui.theknownuniverse.effect_length": "%d Effect Length",
+  "ui.theknownuniverse.max_victims": "%d Max Targets",
+  "attribute.theknownuniverse.darkness_spell_power": "Darkness Spell Power",
+  "attribute.theknownuniverse.darkness_magic_resist": "Darkness Magic Resistance"
+}
